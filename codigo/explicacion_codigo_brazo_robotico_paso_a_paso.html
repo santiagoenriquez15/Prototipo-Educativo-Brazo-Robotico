@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brazo robótico: código por bloques</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6f8;--card:#fff;--tx:#1c2430;--mu:#5b6675;--bd:#d9dee5;--ac:#0b7a75;--chip:#e3f3f2}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1b222b;--tx:#e8edf3;--mu:#9aa6b5;--bd:#2c3644;--ac:#4fd1c5;--chip:#16323a}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1b222b;--tx:#e8edf3;--mu:#9aa6b5;--bd:#2c3644;--ac:#4fd1c5;--chip:#16323a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+main{max-width:860px;margin:0 auto;padding:20px 14px 40px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--mu);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:22px}
+.head{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.num{background:var(--ac);color:var(--bg);font-weight:700;border-radius:50%;width:30px;height:30px;display:grid;place-items:center;flex:none}
+h2{font-size:1.1rem;margin:0}
+.exp{margin:0 0 12px;color:var(--mu)}
+.exp b{color:var(--tx)}
+pre{margin:0;background:#0f1720;color:#e6edf3;border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace}
+</style></head><body><main>
+<h1>Brazo robótico: código por bloques</h1>
+<p class="sub">4 servos controlados con potenciómetros + medidor de batería con divisor de tensión</p>
+<div id="app"></div>
+</main>
+<script>
+const B=[
+{t:"Librería y servos",e:"Se carga la librería <b>Servo</b> y se definen, para cada uno de los 4 servos, su pin, su potenciómetro, sus pulsos y su rango de ángulos. Los <b>límites de ángulo</b> protegen el brazo de choques mecánicos.",c:String.raw`#include <Servo.h>
+
+const int NUM = 4;                                  // Cantidad de servos
+Servo servos[NUM];
+
+const int pinServo[NUM] = {2, 3, 4, 5};             // Pines de señal de los servos
+const int pinPot[NUM]   = {A0, A1, A2, A3};         // Pines de los potenciómetros
+
+const int pulsoMin[NUM] = {544, 544, 544, 544};     // Pulso mínimo (µs)
+const int pulsoMax[NUM] = {2200, 2400, 2400, 2400}; // Pulso máximo (µs)
+
+const int angMin[NUM] = {15, 30, 30, 5};            // Ángulo mínimo permitido
+const int angMax[NUM] = {170, 120, 90, 90};        // Ángulo máximo permitido
+
+// Suavizado: valores bajos = movimiento más suave pero más lento
+const float factorSuavizado[NUM] = {0.20, 0.20, 0.40, 0.45};
+
+float suave[NUM];        // Lectura filtrada de cada potenciómetro
+int ultimoAngulo[NUM];   // Último ángulo enviado al servo`},
+{t:"LEDs indicadores",e:"Tres LEDs muestran el estado de la batería: <b>verde</b> (buena), <b>amarillo</b> (media) y <b>rojo</b> (baja). La variable <b>estadoLED</b> guarda cuál está encendido (-1 = aún ninguno).",c:String.raw`const int LED_VERDE = 8, LED_AMARILLO = 7, LED_ROJO = 6;
+const int ROJO = 0, AMARILLO = 1, VERDE = 2;   // Estados posibles
+int estadoLED = -1;                            // -1 = aún sin definir`},
+{t:"Variables de la batería",e:"El Arduino solo lee hasta 5 V, pero la batería llega a 8.4 V. Por eso se usa un <b>divisor de tensión</b> con dos resistencias (R1 y R2) que reduce el voltaje antes de entrar al pin A7. <b>FACTOR_CAL</b> ajusta el resultado comparando con un multímetro.",c:String.raw`const int PIN_BAT = A7;                        // Entrada del divisor de tensión
+const float R1 = 4700.0, R2 = 2400.0;          // Resistencias del divisor (ohmios)
+const float VREF = 5.09;                       // Voltaje real de referencia del Arduino
+const float FACTOR_CAL = 1.006;                // Ajuste fino con multímetro
+
+float voltajeFiltrado = 0.0;
+bool bateriaInicializada = false;
+
+const unsigned long INTERVALO_MEDICION = 3000; // Medir cada 3 segundos
+unsigned long ultimaMedicion = 0;`},
+{t:"Encender LEDs y leer el voltaje",e:"<b>mostrarLED()</b> enciende solo el LED del estado indicado. <b>leerVoltajeBateria()</b> toma 64 lecturas y las promedia para reducir el ruido; luego <b>deshace el divisor de tensión</b> para obtener el voltaje real de la batería.",c:String.raw`// Enciende solo el LED que corresponde al estado
+void mostrarLED(int estado) {
+  digitalWrite(LED_ROJO,     estado == ROJO);
+  digitalWrite(LED_AMARILLO, estado == AMARILLO);
+  digitalWrite(LED_VERDE,    estado == VERDE);
+}
+
+// Lee el voltaje real de la batería (promedio de 64 lecturas)
+float leerVoltajeBateria() {
+  unsigned long suma = 0;
+  for (int i = 0; i < 64; i++) {
+    suma += analogRead(PIN_BAT);
+    delay(2);
+  }
+  float voltajeA7 = (suma / 64.0) * VREF / 1023.0;   // Voltaje en el pin
+  return voltajeA7 * (R1 + R2) / R2 * FACTOR_CAL;    // Se deshace el divisor
+}`},
+{t:"Porcentaje y estado con histéresis",e:"El voltaje se convierte en porcentaje por tramos. La <b>histéresis</b> usa umbrales distintos para subir y para bajar de estado, así el LED <b>no parpadea</b> cuando el porcentaje oscila cerca de un límite.",c:String.raw`// Convierte voltaje a porcentaje (aproximación por tramos)
+int calcularPorcentaje(float v) {
+  if (v >= 8.40) return 100;
+  if (v >= 8.20) return 90 + (int)((v - 8.20) * 50);
+  if (v >= 8.00) return 80 + (int)((v - 8.00) * 50);
+  if (v >= 7.80) return 60 + (int)((v - 7.80) * 100);
+  if (v >= 7.60) return 40 + (int)((v - 7.60) * 100);
+  if (v >= 7.40) return 20 + (int)((v - 7.40) * 100);
+  if (v >= 7.00) return 5 + (int)((v - 7.00) * 37.5);
+  if (v >= 6.60) return (int)((v - 6.60) * 12.5);
+  return 0;
+}
+
+// Estado sin histéresis (solo en la primera medición)
+int estadoNormal(int p) {
+  if (p <= 20) return ROJO;
+  if (p <= 60) return AMARILLO;
+  return VERDE;
+}
+
+// Estado con histéresis: umbrales distintos al subir y al bajar
+int estadoConHisteresis(int p) {
+  if (estadoLED == -1) return estadoNormal(p);
+
+  if (estadoLED == VERDE)
+    return (p <= 57) ? AMARILLO : VERDE;
+
+  if (estadoLED == AMARILLO) {
+    if (p <= 17) return ROJO;
+    if (p >= 64) return VERDE;
+    return AMARILLO;
+  }
+
+  // estadoLED == ROJO
+  if (p >= 64) return VERDE;
+  if (p >= 24) return AMARILLO;
+  return ROJO;
+}`},
+{t:"Actualizar la batería",e:"Une todo: mide el voltaje, lo <b>filtra</b> (80% valor anterior + 20% valor nuevo para evitar saltos bruscos), calcula el porcentaje, actualiza los LEDs solo si el estado cambió y muestra los datos en el Monitor Serie.",c:String.raw`void actualizarBateria() {
+  float voltajeNuevo = leerVoltajeBateria();
+
+  // Filtro: 80% valor anterior + 20% valor nuevo
+  if (!bateriaInicializada) {
+    voltajeFiltrado = voltajeNuevo;
+    bateriaInicializada = true;
+  } else {
+    voltajeFiltrado = voltajeFiltrado * 0.80 + voltajeNuevo * 0.20;
+  }
+
+  int porcentaje = calcularPorcentaje(voltajeFiltrado);
+  int nuevoEstado = estadoConHisteresis(porcentaje);
+
+  if (nuevoEstado != estadoLED) {   // Solo cambia si el estado cambió
+    estadoLED = nuevoEstado;
+    mostrarLED(estadoLED);
+  }
+
+  Serial.println("\n------------------------------");
+  Serial.print("Voltaje bateria: ");
+  Serial.print(voltajeFiltrado, 2);
+  Serial.println(" V");
+  Serial.print("Porcentaje: ");
+  Serial.print(porcentaje);
+  Serial.println(" %");
+  Serial.print("LED: ");
+  if (estadoLED == ROJO)          Serial.println("ROJO");
+  else if (estadoLED == AMARILLO) Serial.println("AMARILLO");
+  else                            Serial.println("VERDE");
+  Serial.println("------------------------------");
+}`},
+{t:"setup(): configuración inicial",e:"Se ejecuta <b>una sola vez</b> al encender. Configura los LEDs y, antes de activar cada servo, lee su potenciómetro para que <b>arranque en la posición de la perilla</b> sin dar un salto brusco.",c:String.raw`void setup() {
+  Serial.begin(115200);
+
+  pinMode(LED_VERDE, OUTPUT);
+  pinMode(LED_AMARILLO, OUTPUT);
+  pinMode(LED_ROJO, OUTPUT);
+  mostrarLED(-1);                   // Todos los LEDs apagados
+
+  for (int i = 0; i < NUM; i++) {
+    suave[i] = analogRead(pinPot[i]);
+    ultimoAngulo[i] = map((int)suave[i], 0, 1023, angMin[i], angMax[i]);
+
+    servos[i].attach(pinServo[i], pulsoMin[i], pulsoMax[i]);
+    servos[i].write(ultimoAngulo[i]);
+    delay(300);                     // Evita activar todos a la vez
+  }
+
+  Serial.println("\n==============================");
+  Serial.println("BRAZO ROBOTICO");
+  Serial.println("4 SERVOS + BATERIA");
+  Serial.println("==============================");
+
+  actualizarBateria();              // Primera medición
+  ultimaMedicion = millis();
+}`},
+{t:"loop(): ciclo principal",e:"Se repite sin parar. Para cada servo: lee el potenciómetro, <b>suaviza</b> la lectura, la convierte a ángulo con <b>map()</b> y mueve el servo solo si el ángulo cambió (evita temblores). Cada 3 s mide la batería <b>sin detener</b> el movimiento del brazo.",c:String.raw`void loop() {
+  // --- Control de los servos ---
+  for (int i = 0; i < NUM; i++) {
+    int lectura = analogRead(pinPot[i]);
+
+    // Suavizado de la lectura
+    suave[i] = suave[i] * (1.0 - factorSuavizado[i]) + lectura * factorSuavizado[i];
+
+    // Convierte 0-1023 al rango de ángulos de ese servo
+    int angulo = map((int)suave[i], 0, 1023, angMin[i], angMax[i]);
+
+    // Solo mueve el servo si el ángulo cambió
+    if (abs(angulo - ultimoAngulo[i]) >= 1) {
+      servos[i].write(angulo);
+      ultimoAngulo[i] = angulo;
+    }
+  }
+
+  // --- Medición de batería cada 3 segundos ---
+  if (millis() - ultimaMedicion >= INTERVALO_MEDICION) {
+    actualizarBateria();
+    ultimaMedicion = millis();
+  }
+
+  delay(10);
+}`}
+];
+const app=document.getElementById("app");
+B.forEach((b,i)=>{
+  const d=document.createElement("section");d.className="card";
+  d.innerHTML='<div class="head"><div class="num">'+(i+1)+'</div><h2></h2></div><p class="exp">'+b.e+'</p><pre></pre>';
+  d.querySelector("h2").textContent=b.t;
+  d.querySelector("pre").textContent=b.c;
+  app.appendChild(d);
+});
+</script></body></html>
