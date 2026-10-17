@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Recursos educativos para construir, conectar y programar un brazo robótico con Arduino Nano, servomotores y piezas impresas en 3D.">
+  <meta name="theme-color" content="#123d37">
+  <title>Brazo Robótico Educativo | Recursos del proyecto</title>
+  <style>
+    :root {
+      --forest: #123d37;
+      --forest-2: #1b574b;
+      --teal: #187967;
+      --teal-dark: #105b4d;
+      --mint: #e2f0e9;
+      --mint-2: #f1f7f3;
+      --gold: #f1bd55;
+      --ink: #20332e;
+      --muted: #62736c;
+      --line: #d6e2da;
+      --white: #ffffff;
+      --shadow: 0 14px 35px rgba(20, 55, 45, .09);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 85px; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: #f4f7f4;
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    .topbar {
+      background: rgba(18, 61, 55, .98);
+      color: white;
+      padding: 13px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 3px 14px rgba(6, 34, 28, .13);
+    }
+    .nav-inner {
+      max-width: 1120px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand {
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      width: 37px; height: 37px; display: grid; place-items: center;
+      border-radius: 12px; color: var(--forest); background: var(--gold); font-size: 20px;
+    }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 20px; }
+    .nav-links a { color: #e0eee7; text-decoration: none; font-size: .91rem; font-weight: 650; }
+    .nav-links a:hover { color: var(--gold); }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: radial-gradient(circle at 80% 18%, rgba(65, 141, 111, .42), transparent 33%),
+                  linear-gradient(125deg, #0d302c 0%, #123d37 54%, #1d5c4b 100%);
+      padding: 66px 22px 72px;
+    }
+    .hero::after {
+      content: ""; position: absolute; right: -120px; bottom: -230px;
+      width: 500px; height: 500px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 0 0 42px rgba(255,255,255,.025), 0 0 0 90px rgba(255,255,255,.02);
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: 1120px; margin: auto; display: grid;
+      grid-template-columns: 1.03fr .97fr; gap: 52px; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      text-transform: uppercase; letter-spacing: 1.8px; font-size: .75rem; font-weight: 800;
+      color: #c3e4d3; margin-bottom: 13px;
+    }
+    .eyebrow::before { content: ""; width: 25px; height: 2px; background: var(--gold); }
+    h1 { margin: 0 0 18px; font-size: clamp(2.5rem, 5vw, 4.2rem); line-height: 1.08; letter-spacing: -1.8px; }
+    .hero p { color: #d9e9e0; max-width: 590px; font-size: 1.08rem; margin: 0 0 25px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0 25px; }
+    .btn {
+      display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+      padding: 12px 17px; border-radius: 10px; text-decoration: none; text-align: center;
+      font-weight: 800; font-size: .94rem; border: 1px solid transparent;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      cursor: pointer;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--teal); color: white; box-shadow: 0 6px 15px rgba(9, 45, 36, .18); }
+    .btn-primary:hover { background: #22927b; box-shadow: 0 9px 21px rgba(9, 45, 36, .23); }
+    .btn-light { background: #f8fcf9; color: var(--forest); }
+    .btn-light:hover { background: var(--gold); }
+    .btn-outline { border-color: #b8cec2; background: white; color: var(--forest); }
+    .btn-outline:hover { background: var(--mint); }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      display: inline-flex; padding: 6px 10px; border-radius: 999px;
+      background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.17);
+      color: #e9f3ed; font-size: .8rem; font-weight: 650;
+    }
+    .hero-visual {
+      position: relative; padding: 12px; background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.2); border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.24); transform: rotate(1deg);
+    }
+    .hero-visual img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; display: block; border-radius: 16px; background: #edf2ed; }
+    .visual-caption {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 8px 3px; font-size: .86rem; color: #e5f2e9;
+    }
+    .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #8ee0ad; margin-right: 7px; }
+    .content { max-width: 1120px; margin: auto; padding: 0 22px 48px; }
+    .intro {
+      background: white; margin: 28px 0 42px; padding: 26px 28px;
+      border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .intro h2 { color: var(--forest); margin: 0 0 7px; font-size: 1.55rem; }
+    .intro p { margin: 0 auto; max-width: 780px; color: var(--muted); }
+    .resource-section {
+      background: white; border: 1px solid var(--line); border-top: 5px solid var(--teal);
+      border-radius: 21px; margin: 0 0 34px; padding: 30px;
+      box-shadow: var(--shadow);
+    }
+    .resource-section.programming-section { border-top-color: #39718b; }
+    .resource-section.learning-section { border-top-color: #d89b2b; }
+    .section-header { text-align: center; margin: 0 auto 27px; max-width: 760px; }
+    .section-kicker { color: var(--teal); font-size: .75rem; font-weight: 850; letter-spacing: 1.8px; text-transform: uppercase; }
+    .programming-section .section-kicker { color: #39718b; }
+    .learning-section .section-kicker { color: #946a12; }
+    .section-header h2 { margin: 5px 0 8px; color: var(--forest); font-size: clamp(1.55rem, 3vw, 2.1rem); line-height: 1.25; }
+    .section-header p { color: var(--muted); max-width: 700px; margin: auto; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(245px, 1fr)); gap: 18px; }
+    .card {
+      background: #f8fbf8; border: 1px solid #dce7df; border-radius: 15px;
+      padding: 23px; min-height: 240px; display: flex; flex-direction: column; align-items: flex-start;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(18,61,55,.1); border-color: #9fc5b1; }
+    .card-icon {
+      width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
+      font-size: 24px; background: var(--mint); margin-bottom: 15px;
+    }
+    .programming-section .card-icon { background: #e8f0f6; }
+    .learning-section .card-icon { background: #fff3d9; }
+    .card h3 { color: var(--forest); margin: 0 0 8px; font-size: 1.17rem; line-height: 1.35; }
+    .card p { color: #5f7068; margin: 0 0 16px; font-size: .94rem; }
+    .card ul { margin: 0 0 18px; padding-left: 20px; color: #5f7068; font-size: .91rem; }
+    .card ul li + li { margin-top: 4px; }
+    .button-row { display: flex; flex-direction: column; gap: 9px; margin-top: auto; width: 100%; }
+    .button-row .btn { width: 100%; padding: 11px 13px; font-size: .9rem; }
+    .btn-wide { width: 100%; margin-top: auto; }
+    .feature-band {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 38px;
+    }
+    .feature {
+      background: var(--mint-2); border: 1px solid var(--line); border-radius: 14px;
+      padding: 17px 18px; display: flex; gap: 12px; align-items: flex-start;
+    }
+    .feature .emoji { font-size: 25px; line-height: 1.3; }
+    .feature strong { display: block; color: var(--forest); font-size: .94rem; }
+    .feature span { display: block; color: var(--muted); font-size: .84rem; line-height: 1.45; margin-top: 3px; }
+    .gallery {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 24px;
+    }
+    .gallery figure { margin: 0; padding: 10px; background: #f8fbf8; border: 1px solid var(--line); border-radius: 15px; }
+    .gallery img { width: 100%; height: 250px; object-fit: contain; display: block; background: white; border-radius: 10px; }
+    .gallery figcaption { padding: 10px 6px 4px; color: var(--muted); font-size: .9rem; }
+    .download-panel {
+      background: linear-gradient(125deg, #123d37, #206651); color: white; border-radius: 20px;
+      padding: 30px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 20px; margin: 38px 0 0;
+    }
+    .download-panel h2 { margin: 0 0 7px; font-size: 1.5rem; }
+    .download-panel p { margin: 0; color: #d9e9e0; max-width: 700px; }
+    .download-panel .btn { flex-shrink: 0; }
+    footer { text-align: center; background: #e8efe9; padding: 27px 20px; color: #586b61; font-size: .88rem; }
+    footer strong { color: var(--forest); }
+    footer p { margin: 4px 0; }
+    .small-note { color: var(--muted); font-size: .83rem; margin-top: 14px; }
+    @media (max-width: 760px) {
+      .topbar { position: static; }
+      .nav-inner { align-items: flex-start; flex-direction: column; gap: 12px; }
+      .nav-links { gap: 13px; }
+      .hero { padding: 48px 18px 46px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 30px; }
+      .hero-visual { max-width: 600px; width: 100%; margin: auto; transform: none; }
+      .content { padding: 0 14px 35px; }
+      .intro { padding: 22px 17px; margin: 20px 0 28px; }
+      .resource-section { padding: 21px 16px; margin-bottom: 24px; }
+      .grid { grid-template-columns: 1fr; }
+      .card { min-height: auto; padding: 21px; }
+      .feature-band { grid-template-columns: 1fr; gap: 10px; }
+      .gallery { grid-template-columns: 1fr; }
+      .gallery img { height: auto; max-height: 360px; }
+      .download-panel { padding: 24px 20px; }
+      .download-panel .btn { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav-inner">
+      <a class="brand" href="#inicio" aria-label="Inicio del brazo robótico educativo">
+        <span class="brand-mark">🤖</span>
+        <span>Brazo Robótico Educativo</span>
+      </a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#componentes">Componentes</a>
+        <a href="#programacion">Programación</a>
+        <a href="#material">Cartilla y recursos</a>
+      </nav>
+    </div>
+  </header>
+
+  <header class="hero" id="inicio">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow">Robótica educativa · Nariño, Colombia</span>
+        <h1>Construye.<br>Programa.<br><span style="color:#f1bd55">Experimenta.</span></h1>
+        <p>Explora el brazo robótico educativo desarrollado con Arduino Nano, cuatro servomotores y piezas fabricadas mediante impresión 3D. Aquí encontrarás los recursos para conocerlo, construirlo y comprender su programación.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#componentes">🔧 Explorar recursos</a>
+          <a class="btn btn-light" href="codigo/explicacion_codigo_brazo_robotico_paso_a_paso.html" target="_blank" rel="noopener noreferrer">💻 Ver código explicado</a>
+        </div>
+        <div class="hero-tags">
+          <span class="tag">Arduino Nano</span>
+          <span class="tag">4 servomotores</span>
+          <span class="tag">Control por potenciómetros</span>
+          <span class="tag">Impresión 3D</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <img src="imagenes/Foto%20real%20brazo%20robotico%202.jpeg" alt="Fotografía del brazo robótico educativo ensamblado" fetchpriority="high">
+        <div class="visual-caption">
+          <span><span class="live-dot"></span>Prototipo físico</span>
+          <span>Diseño · Electrónica · Programación</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="intro">
+      <h2>📚 Recursos para aprender haciendo</h2>
+      <p>Este espacio reúne los materiales del tercer prototipo del proyecto <strong>“Desarrollo de Prototipos Robóticos Educativos para la enseñanza en Nariño”</strong>. Consulta los archivos en línea o descárgalos para trabajar con ellos.</p>
+    </section>
+
+    <div class="feature-band" aria-label="Características del prototipo">
+      <div class="feature"><span class="emoji">🎛️</span><div><strong>Control manual</strong><span>Cuatro potenciómetros permiten controlar los movimientos del brazo.</span></div></div>
+      <div class="feature"><span class="emoji">🦾</span><div><strong>Cuatro movimientos</strong><span>Base, hombro, codo y pinza accionados mediante servomotores.</span></div></div>
+      <div class="feature"><span class="emoji">🔋</span><div><strong>Indicador de batería</strong><span>Lectura de voltaje con divisor resistivo y tres LED indicadores.</span></div></div>
+    </div>
+
+    <section class="resource-section components-section" id="componentes">
+      <div class="section-header">
+        <span class="section-kicker">Bloque 01</span>
+        <h2>🔩 Componentes, piezas y conexiones</h2>
+        <p>Conoce los elementos principales del prototipo, revisa el circuito eléctrico y descarga las piezas para fabricar la estructura mediante impresión 3D.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="card-icon">🧰</div>
+          <h3>Componentes electrónicos</h3>
+          <p>Elementos principales utilizados para controlar las articulaciones y supervisar el nivel de batería.</p>
+          <ul>
+            <li>Arduino Nano</li>
+            <li>2 servomotores SG-5010</li>
+            <li>1 servomotor MG90S y 1 SG90</li>
+            <li>4 potenciómetros de 10 kΩ</li>
+            <li>LED indicadores, resistencias y módulo regulador</li>
+          </ul>
+          <a class="btn btn-outline btn-wide" href="imagenes/Foto%20real%20brazo%20robotico%202.jpeg" target="_blank" rel="noopener noreferrer">🖼️ Ver foto del prototipo</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🖨️</div>
+          <h3>Piezas para impresión 3D</h3>
+          <p>Archivo comprimido con los modelos STL preparados para fabricar la estructura del brazo robótico.</p>
+          <div class="button-row">
+            <a class="btn btn-primary" href="piezas3D/Archivos%20STL%20Brazo%20Robotico.zip" download>📦 Descargar piezas STL (.zip)</a>
+            <a class="btn btn-outline" href="imagenes/render%20brazo%20robotico.jpg" target="_blank" rel="noopener noreferrer">👁️ Ver render del diseño</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Circuito eléctrico</h3>
+          <p>Consulta el diagrama de conexiones para identificar el cableado entre el Arduino, los servomotores, los potenciómetros y los indicadores.</p>
+          <div class="button-row">
+            <a class="btn btn-primary" href="circuito/Circuito%20Brazo%20Robotico_final.png" target="_blank" rel="noopener noreferrer">👁️ Visualizar circuito</a>
+            <a class="btn btn-outline" href="circuito/Circuito%20Brazo%20Robotico_final.png" download>⬇️ Descargar diagrama PNG</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="resource-section programming-section" id="programacion">
+      <div class="section-header">
+        <span class="section-kicker">Bloque 02</span>
+        <h2>💻 Código y programación</h2>
+        <p>Accede al programa del Arduino Nano y a la guía interactiva que explica el código por bloques, paso a paso y con ejemplos.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="card-icon">⌨️</div>
+          <h3>Código de Arduino Nano</h3>
+          <p>Programa que lee los potenciómetros, suaviza las señales, controla los cuatro servomotores y actualiza los LED indicadores de batería.</p>
+          <div class="button-row">
+            <a class="btn btn-primary" href="https://github.com/santiagoenriquez15/Prototipo-Educativo-Brazo-Robotico/blob/main/codigo/Codigo_brazo_robotico.ino" target="_blank" rel="noopener noreferrer">👁️ Visualizar código</a>
+            <a class="btn btn-outline" href="https://raw.githubusercontent.com/santiagoenriquez15/Prototipo-Educativo-Brazo-Robotico/main/codigo/Codigo_brazo_robotico.ino" download>⬇️ Descargar archivo .ino</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🧩</div>
+          <h3>Explicación paso a paso</h3>
+          <p>Guía interactiva organizada por bloques: librería Servo, lectura de potenciómetros, suavizado de movimiento, medición de batería e instrucciones principales.</p>
+          <div class="button-row">
+            <a class="btn btn-primary" href="codigo/explicacion_codigo_brazo_robotico_paso_a_paso.html" target="_blank" rel="noopener noreferrer">🚀 Abrir explicación interactiva</a>
+            <a class="btn btn-outline" href="https://raw.githubusercontent.com/santiagoenriquez15/Prototipo-Educativo-Brazo-Robotico/main/codigo/explicacion_codigo_brazo_robotico_paso_a_paso.html" download>⬇️ Descargar explicación HTML</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🎛️</div>
+          <h3>Distribución de pines</h3>
+          <p>Referencia rápida de las conexiones principales utilizadas por el programa.</p>
+          <ul>
+            <li>Servos: D2, D3, D4 y D5</li>
+            <li>LED: D6, D7 y D8</li>
+            <li>Potenciómetros: A0, A1, A2 y A3</li>
+            <li>Medición de batería: A7</li>
+          </ul>
+          <a class="btn btn-outline btn-wide" href="circuito/Circuito%20Brazo%20Robotico_final.png" target="_blank" rel="noopener noreferrer">🔌 Consultar conexiones</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="resource-section learning-section" id="material">
+      <div class="section-header">
+        <span class="section-kicker">Bloque 03</span>
+        <h2>📖 Cartilla educativa y material de apoyo</h2>
+        <p>Utiliza la cartilla para acompañar el proceso de armado y aprendizaje, y explora las imágenes del prototipo físico y de su diseño digital.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="card-icon">📘</div>
+          <h3>Cartilla del brazo robótico</h3>
+          <p>Material educativo con información del prototipo, componentes, montaje, conexiones y programación.</p>
+          <div class="button-row">
+            <a class="btn btn-primary" href="cartilla/Cartilla_Brazo_Robotico.pdf" target="_blank" rel="noopener noreferrer">📖 Visualizar cartilla PDF</a>
+            <a class="btn btn-outline" href="cartilla/Cartilla_Brazo_Robotico.pdf" download>📥 Descargar cartilla</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📸</div>
+          <h3>Galería del prototipo</h3>
+          <p>Compara la fotografía del brazo ensamblado con la representación digital del diseño mecánico.</p>
+          <div class="button-row">
+            <a class="btn btn-primary" href="imagenes/Foto%20real%20brazo%20robotico%202.jpeg" target="_blank" rel="noopener noreferrer">🖼️ Ver fotografía del brazo</a>
+            <a class="btn btn-outline" href="imagenes/prototipo_impreso.jpg" target="_blank" rel="noopener noreferrer">🔍 Ver prototipo impreso</a>
+            <a class="btn btn-outline" href="imagenes/render%20brazo%20robotico.jpg" target="_blank" rel="noopener noreferrer">🧱 Ver diseño digital</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🎓</div>
+          <h3>Cómo aprovechar los recursos</h3>
+          <p>Una ruta sugerida para trabajar con el material del proyecto.</p>
+          <ul>
+            <li>Consulta la lista de componentes y el diagrama.</li>
+            <li>Revisa los modelos y prepara la impresión 3D.</li>
+            <li>Lee la explicación del programa antes de modificarlo.</li>
+            <li>Usa la cartilla como guía durante el montaje.</li>
+          </ul>
+          <a class="btn btn-outline btn-wide" href="#inicio">↑ Volver al inicio</a>
+        </article>
+      </div>
+
+      <div class="gallery" aria-label="Imágenes de referencia del brazo robótico">
+        <figure>
+          <a href="imagenes/prototipo_impreso.jpg" target="_blank" rel="noopener noreferrer">
+            <img src="imagenes/prototipo_impreso.jpg" alt="Fotografía del prototipo de brazo robótico impreso" loading="lazy">
+          </a>
+          <figcaption>Prototipo físico y piezas impresas en 3D.</figcaption>
+        </figure>
+        <figure>
+          <a href="imagenes/render%20brazo%20robotico.jpg" target="_blank" rel="noopener noreferrer">
+            <img src="imagenes/render%20brazo%20robotico.jpg" alt="Render digital del diseño del brazo robótico" loading="lazy">
+          </a>
+          <figcaption>Vista digital del diseño mecánico del brazo robótico.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="download-panel">
+      <div>
+        <h2>¿Listo para construir y programar?</h2>
+        <p>Empieza con la cartilla, revisa las conexiones y descarga los archivos de impresión 3D para conocer cómo se integra cada parte del prototipo.</p>
+      </div>
+      <a class="btn btn-light" href="cartilla/Cartilla_Brazo_Robotico.pdf" target="_blank" rel="noopener noreferrer">📘 Abrir cartilla educativa</a>
+    </section>
+    <p class="small-note">Nota: para observar la explicación por bloques, abre la guía interactiva desde el apartado de programación. El contenido se puede consultar desde computador o celular.</p>
+  </main>
+
+  <footer>
+    <p><strong>Prototipo Robótico Educativo · Brazo Robótico</strong></p>
+    <p>Proyecto: “Desarrollo de Prototipos Robóticos Educativos para la enseñanza en Nariño”.</p>
+    <p>Ingeniería Electrónica · Nariño, Colombia</p>
+    <p>La pinza se basa en un modelo de SuperbTech publicado en Thingiverse bajo licencia CC BY, con modificaciones para su adaptación al prototipo. <a href="https://www.thingiverse.com/thing:5149951" target="_blank" rel="noopener noreferrer">Consultar diseño original</a>.</p>
+  </footer>
+</body>
+</html>
