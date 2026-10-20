@@ -126,6 +126,37 @@
     }
     .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #8ee0ad; margin-right: 7px; }
     .content { max-width: 1120px; margin: auto; padding: 0 22px 48px; }
+    .prototype-video {
+      margin: 30px 0 42px;
+      padding: 26px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .prototype-video h2 {
+      color: var(--forest);
+      margin: 0 0 8px;
+      font-size: clamp(1.45rem, 3vw, 2rem);
+      line-height: 1.3;
+    }
+    .prototype-video p {
+      color: var(--muted);
+      margin: 0 auto 18px;
+      max-width: 720px;
+    }
+    .prototype-video video {
+      display: block;
+      width: 100%;
+      max-width: 850px;
+      max-height: 520px;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      margin: 0 auto;
+      border-radius: 14px;
+      background: #102b25;
+    }
     .intro {
       background: white; margin: 28px 0 42px; padding: 26px 28px;
       border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
@@ -207,6 +238,8 @@
       .hero-visual { max-width: 600px; width: 100%; margin: auto; transform: none; }
       .content { padding: 0 14px 35px; }
       .intro { padding: 22px 17px; margin: 20px 0 28px; }
+      .prototype-video { padding: 19px 14px; margin: 20px 0 28px; }
+      .prototype-video video { aspect-ratio: 4 / 3; }
       .resource-section { padding: 21px 16px; margin-bottom: 24px; }
       .grid { grid-template-columns: 1fr; }
       .card { min-height: auto; padding: 21px; }
@@ -265,6 +298,15 @@
   </header>
 
   <main class="content">
+    <section class="prototype-video" aria-labelledby="demo-title">
+      <h2 id="demo-title">🎥 El brazo robótico en funcionamiento</h2>
+      <p>Observa cómo el prototipo educativo utiliza su pinza para realizar una tarea.</p>
+      <video autoplay muted loop playsinline preload="metadata" aria-label="Demostración del brazo robótico educativo en funcionamiento">
+        <source src="videos/brazo-atrapando-cinta.mp4" type="video/mp4">
+        Tu navegador no puede reproducir este video.
+      </video>
+    </section>
+
     <section class="intro">
       <h2>📚 Recursos para aprender haciendo</h2>
       <p>Este espacio reúne los materiales del tercer prototipo del proyecto <strong>“Desarrollo de Prototipos Robóticos Educativos para la enseñanza en Nariño”</strong>. Consulta los archivos en línea o descárgalos para trabajar con ellos.</p>
@@ -348,18 +390,6 @@
           </div>
         </article>
 
-        <article class="card">
-          <div class="card-icon">🎛️</div>
-          <h3>Distribución de pines</h3>
-          <p>Referencia rápida de las conexiones principales utilizadas por el programa.</p>
-          <ul>
-            <li>Servos: D2, D3, D4 y D5</li>
-            <li>LED: D6, D7 y D8</li>
-            <li>Potenciómetros: A0, A1, A2 y A3</li>
-            <li>Medición de batería: A7</li>
-          </ul>
-          <a class="btn btn-outline btn-wide" href="circuito/Circuito%20Brazo%20Robotico_final.png" target="_blank" rel="noopener noreferrer">🔌 Consultar conexiones</a>
-        </article>
       </div>
     </section>
 
@@ -380,17 +410,6 @@
           </div>
         </article>
 
-        <article class="card">
-          <div class="card-icon">📸</div>
-          <h3>Galería del prototipo</h3>
-          <p>Compara la fotografía del brazo ensamblado con la representación digital del diseño mecánico.</p>
-          <div class="button-row">
-            <a class="btn btn-primary" href="imagenes/Foto%20real%20brazo%20robotico%202.jpeg" target="_blank" rel="noopener noreferrer">🖼️ Ver fotografía del brazo</a>
-            <a class="btn btn-outline" href="imagenes/prototipo_impreso.jpg" target="_blank" rel="noopener noreferrer">🔍 Ver prototipo impreso</a>
-            <a class="btn btn-outline" href="imagenes/render%20brazo%20robotico.jpg" target="_blank" rel="noopener noreferrer">🧱 Ver diseño digital</a>
-          </div>
-        </article>
-
         <article class="card video-tutorial-card">
           <div class="card-icon">🎬</div>
           <h3>Tutorial de armado del brazo robótico</h3>
@@ -407,16 +426,6 @@
           <a class="btn btn-primary btn-wide" href="https://youtu.be/NDgV870ryDU" target="_blank" rel="noopener noreferrer">▶️ Ver video en YouTube</a>
         </article>
       </div>
-
-      <article class="card" style="margin-top:22px; min-height:auto;">
-        <div class="card-icon">🎥</div>
-        <h3>Demostración del prototipo en funcionamiento</h3>
-        <p>Observa el brazo robótico educativo mientras realiza una tarea con su pinza.</p>
-        <video controls preload="metadata" playsinline style="width:100%; max-height:480px; border-radius:12px; background:#102b25;">
-          <source src="videos/brazo-atrapando-cinta.mp4" type="video/mp4">
-          Tu navegador no puede reproducir este video. <a href="videos/brazo-atrapando-cinta.mp4">Abrir video demostrativo</a>.
-        </video>
-      </article>
 
       <div class="gallery" aria-label="Imágenes de referencia del brazo robótico">
         <figure>
